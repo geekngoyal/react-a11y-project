@@ -21,7 +21,7 @@ export const calculate = (expression: string): number | string => {
 
 export const evaluateExpression = (expr: string): number => {
   while (expr.includes('(')) {
-    expr = expr.replace(/\(([^()]+)\)/g, (match, inner) => {
+    expr = expr.replace(/\(([^()]+)\)/g, (_match, inner) => {
       return String(evaluateExpression(inner));
     });
   }
@@ -37,7 +37,7 @@ const processOperators = (expr: string, operators: string[]): string => {
   const regex = new RegExp(`(-?\\d+\\.?\\d*)([${operators.map(op => '\\' + op).join('')}])(-?\\d+\\.?\\d*)`);
   
   while (regex.test(expr)) {
-    expr = expr.replace(regex, (match, num1, operator, num2) => {
+    expr = expr.replace(regex, (_match, num1, operator, num2) => {
       const n1 = parseFloat(num1);
       const n2 = parseFloat(num2);
       let result: number;
