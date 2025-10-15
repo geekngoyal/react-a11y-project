@@ -35,7 +35,13 @@ describe('App Component - Rendering Tests', () => {
   describe('Component Rendering', () => {
     it('should render components', () => {
       render(<App />);
-      
+      const mainDiv = screen.getByTestId('app-container');
+      expect(mainDiv).toHaveStyle({
+        backgroundColor: '#fff',
+        color: '#767676'
+      });
+
+
       const heading = screen.getByRole('heading', { name: /string calculator/i });
       expect(heading).toBeInTheDocument();
       expect(heading.tagName).toBe('H1');
