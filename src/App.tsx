@@ -1,5 +1,22 @@
 import { useState } from 'react';
 
+//Issues identified
+// Change div to button for Calculate
+// Add alt text to image
+// Fix color contrast (#aaa → #767676 or darker)
+
+// Fix heading hierarchy (h1 → h2)
+// Add keyboard support to interactive elements
+
+// Fix alert role usage
+// Add focus indicators
+// Don't rely on color alone for result
+
+// Add skip navigation
+// Set textarea dimensions
+// Verify page title
+
+
 const App = () => {
   const [input, setInput] = useState('');
   const [result] = useState(null);
