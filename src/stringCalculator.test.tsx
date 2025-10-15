@@ -84,6 +84,10 @@ describe('App Component - Rendering Tests', () => {
       
       // Verify button is in the tab order (tabIndex >= 0 or default)
       expect(button).not.toHaveAttribute('tabindex', '-1');
+      // Check border color when button is focused
+      expect(button).toHaveStyle({
+        border: '2px solid #005f73'
+      });
     });
   });
 });
