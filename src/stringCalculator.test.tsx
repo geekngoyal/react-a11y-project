@@ -66,5 +66,18 @@ describe('App Component - Rendering Tests', () => {
       const alert = screen.queryByRole('alert');
       expect(alert).not.toBeInTheDocument();
     });
+
+    it('should allow button to receive focus via keyboard navigation', () => {
+      render(<App />);
+      
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      // Test that button is focusable (keyboard accessible)
+      button.focus();
+      expect(button).toHaveFocus();
+      
+      // Verify button is in the tab order (tabIndex >= 0 or default)
+      expect(button).not.toHaveAttribute('tabindex', '-1');
+    });
   });
 });
