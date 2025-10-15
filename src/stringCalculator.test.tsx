@@ -1,35 +1,6 @@
-// Component Rendering
-
 import { describe, expect, it } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import App from './App';
-
-
-// User Interactions
-// Should update input state when user types in textarea
-// Should call handleCalculate when Calculate button is clicked
-// Should display result when result state is not null
-
-// Accessibility
-
-// Should have proper heading hierarchy
-// Should have placeholder text for textarea
-// Should have alert role on warning message
-
-// Negative Test Scenarios
-// Missing/Null Values
-// Should not display result paragraph when result is null
-// Should handle empty input gracefully
-
-// Edge Cases
-// Should handle special characters in input
-// Should handle very long input strings
-
-// Accessibility Issues
-// Should flag incorrect heading hierarchy (h2 after h1)
-// Should flag missing alt text on image
-// Should flag non-button element used as button (div with onClick)
-// Should flag low color contrast (#aaa on #fff)
 
 describe('App Component - Rendering Tests', () => {
   describe('Component Rendering', () => {
@@ -40,7 +11,6 @@ describe('App Component - Rendering Tests', () => {
         backgroundColor: '#fff',
         color: '#767676'
       });
-
 
       const heading = screen.getByRole('heading', { name: /string calculator/i });
       expect(heading).toBeInTheDocument();
@@ -78,16 +48,250 @@ describe('App Component - Rendering Tests', () => {
       
       const button = screen.getByRole('button', { name: /calculate/i });
       
-      // Test that button is focusable (keyboard accessible)
       button.focus();
       expect(button).toHaveFocus();
       
-      // Verify button is in the tab order (tabIndex >= 0 or default)
       expect(button).not.toHaveAttribute('tabindex', '-1');
-      // Check border color when button is focused
       expect(button).toHaveStyle({
         border: '2px solid #005f73'
       });
+    });
+  });
+
+  describe('Textarea Input Validation', () => {
+    it('should handle null/empty input', async() => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      expect(textarea.value).toBe('');
+      
+      button.click();
+      
+      const errorMessage = await screen.findByText(/please enter an expression/i);
+      expect(errorMessage).toBeInTheDocument();
+    });
+
+    it('should reject invalid characters in input', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      const invalidInputs = [
+        'abc',
+        '10 + @',
+        '5 # 3',
+        '10 $ 5',
+        'hello world',
+        '10 & 5',
+      ];
+      
+      for (const input of invalidInputs) {
+        fireEvent.change(textarea, { target: { value: '' } });
+        
+        fireEvent.change(textarea, { target: { value: input } });
+        
+        button.click();
+        
+        const errorMessage = await screen.findByText(/invalid characters/i);
+        expect(errorMessage).toBeInTheDocument();
+      }
+    });
+
+    it('should accept valid mathematical expressions', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      const validInputs = [
+        '10 + 5',
+        '20 - 10',
+        '5 * 4',
+        '20 / 4',
+        '10 % 3',
+        '(10 + 5) * 2',
+        '10.5 + 2.3',
+      ];
+      
+      for (const input of validInputs) {
+        fireEvent.change(textarea, { target: { value: '' } });
+        
+        fireEvent.change(textarea, { target: { value: input } });
+        
+        button.click();
+        
+        const result = await screen.findByText(/result/i);
+        expect(result).toBeInTheDocument();
+      }
+    });
+
+    it('should handle whitespace in expressions correctly', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      const inputsWithSpaces = [
+        '10 + 5',
+        '  10+5  ',
+        '10  +  5',
+        '\n10 + 5\n',
+      ];
+      
+      for (const input of inputsWithSpaces) {
+        fireEvent.change(textarea, { target: { value: '' } });
+        
+        fireEvent.change(textarea, { target: { value: input } });
+        
+        button.click();
+        
+        const result = await screen.findByText(/result/i);
+        expect(result).toBeInTheDocument();
+      }
+    });
+
+    it('should validate and display correct result for addition', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '10 + 5' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*15/i);
+      expect(result).toBeInTheDocument();
+    });
+
+    it('should validate and display correct result for subtraction', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '20 - 5' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*15/i);
+      expect(result).toBeInTheDocument();
+    });
+
+    it('should validate and display correct result for multiplication', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '5 * 4' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*20/i);
+      expect(result).toBeInTheDocument();
+    });
+
+    it('should validate and display correct result for division', async () => {
+      
+      
+      //await act(async () => {
+        await render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      fireEvent.change(textarea, { target: { value: '20 / 4' } });
+      button.click();
+      const result = await screen.findByText(/result.*5/i);
+      expect(result).toBeInTheDocument();
+      });
+   // });
+
+    it('should validate and display correct result for modulo', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '10 % 3' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*1/i);
+      expect(result).toBeInTheDocument();
+    });
+
+    it('should handle complex expressions with parentheses', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '(10 + 5) * 2' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*30/i);
+      expect(result).toBeInTheDocument();
+    });
+
+    it('should handle decimal numbers', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '10.5 + 2.5' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*13/i);
+      expect(result).toBeInTheDocument();
+    });
+
+    it('should handle negative numbers', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '10 + (-5)' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*5/i);
+      expect(result).toBeInTheDocument();
+    });
+
+    it('should handle division by zero gracefully', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '10 / 0' } });
+      
+      button.click();
+      
+      const errorMessage = await screen.findByText(/error/i);
+      expect(errorMessage).toBeInTheDocument();
+    });
+
+    it('should handle very long expressions', async () => {
+      render(<App />);
+      
+      const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+      const button = screen.getByRole('button', { name: /calculate/i });
+      
+      fireEvent.change(textarea, { target: { value: '1 + 2 + 3 + 4 + 5 + 6 + 7 + 8 + 9 + 10' } });
+      
+      button.click();
+      
+      const result = await screen.findByText(/result.*55/i);
+      expect(result).toBeInTheDocument();
     });
   });
 });
