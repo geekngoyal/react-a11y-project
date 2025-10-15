@@ -63,9 +63,8 @@ describe('App Component - Rendering Tests', () => {
       expect(image).toHaveAttribute('height', '400');
       expect(image).toHaveAttribute('src', expect.stringContaining('unsplash.com'));
 
-      const alert = screen.getByRole('alert');
+      const alert = screen.queryByRole('alert');
       expect(alert).not.toBeInTheDocument();
-      expect(alert).toHaveTextContent('Make sure you enter numbers correctly!');
     });
   });
 });
