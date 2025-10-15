@@ -196,19 +196,14 @@ describe('App Component - Rendering Tests', () => {
     });
 
     it('should validate and display correct result for division', async () => {
-      
-      
-      //await act(async () => {
-        await render(<App />);
-      
+      await render(<App />);
       const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
       const button = screen.getByRole('button', { name: /calculate/i });
       fireEvent.change(textarea, { target: { value: '20 / 4' } });
       button.click();
       const result = await screen.findByText(/result.*5/i);
       expect(result).toBeInTheDocument();
-      });
-   // });
+    });
 
     it('should validate and display correct result for modulo', async () => {
       render(<App />);
